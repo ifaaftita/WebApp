@@ -1,0 +1,349 @@
+/* MAIN DASHBOARD LAYOUT */
+.opticien-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-main {
+  flex: 1;
+  margin-left: 250px;
+  padding-top: 0;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 2.5rem 2rem 2rem;
+  overflow-y: auto;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* HEADER STYLES */
+.opticien-header {
+  position: sticky;
+  top: 0;
+  left: 250px;
+  right: 0;
+  height: 99px;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-bottom: 1.5rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0; 
+}
+
+.header-left h1 {
+  font-size: 1.8rem;
+  color: #2a2e3f;
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.uptodown-label {
+  font-size: 1rem;
+  color: #4a90e2;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background-color: #e9f2ff;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto; 
+}
+
+.header-icons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-left: auto; 
+}
+
+/* ICON STYLES */
+.icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-icon {
+  font-size: 1.25rem;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.icon-btn:hover .header-icon {
+  color: #4a90e2;
+  transform: translateY(-1px);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* PROFILE DROPDOWN STYLES */
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: none;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-trigger:hover {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.profile-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e9f2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-icon {
+  font-size: 1.1rem;
+  color: #4a90e2;
+}
+
+.profile-email {
+  font-size: 0.9rem;
+  color: #555;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-chevron {
+  font-size: 1rem;
+  color: #6c757d;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-chevron.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  z-index: 100;
+  padding: 0.5rem 0;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+  color: #4a90e2;
+}
+
+.dropdown-icon {
+  margin-right: 0.75rem;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-item:hover .dropdown-icon {
+  transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* STATS CARDS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2a2e3f;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+  .dashboard-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .stats-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: 0;
+  }
+  
+  .opticien-header {
+    left: 0;
+    padding: 0 1rem;
+    height: 70px;
+  }
+  
+  .header-left h1 {
+    font-size: 1.5rem;
+  }
+  
+  .uptodown-label {
+    font-size: 0.85rem;
+    padding: 0.15rem 0.5rem;
+  }
+  
+  .header-right {
+    gap: 1rem;
+  }
+  
+  .profile-email {
+    display: none;
+  }
+  
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-left {
+    gap: 0.5rem;
+  }
+  
+  .header-left h1 {
+    font-size: 1.3rem;
+  }
+  
+  .uptodown-label {
+    display: none;
+  }
+  
+  .header-icons {
+    gap: 0.5rem;
+  }
+  
+  .dashboard-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .opticien-header {
+    height: 60px;
+  }
+  
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+}

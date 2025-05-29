@@ -1,0 +1,721 @@
+.rendezvous-section {
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.625rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  margin: 1rem 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+}
+
+/* Header with Title and Controls */
+.rendezvous-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.rendezvous-header h2 {
+  color: #2a3042;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.rendezvous-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Search Bar Styling */
+.search-bar {
+  position: relative;
+  flex-grow: 1;
+  min-width: 250px;
+  height: 2.625rem;
+}
+
+.search-bar input {
+  padding: 0 1rem 0 2.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  width: 100%;
+  height: 100%;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  color: #4a4a4a;
+  box-sizing: border-box;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #4facfe;
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+  background-color: #fff;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9c9fa6;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Filter Dropdown */
+.filter-dropdown {
+  position: relative;
+  min-width: 180px;
+  height: 2.625rem;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 0 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #4a4a4a;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-toggle:hover {
+  background-color: #f1f3f5;
+}
+
+.dropdown-icon {
+  transition: transform 0.3s ease;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.filter-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  color: #4a4a4a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-option:hover {
+  background-color: #f8f9fa;
+}
+
+.filter-option.active {
+  background-color: #f0f7ff;
+  color: #4facfe;
+  font-weight: 500;
+}
+
+/* Add Appointment Button */
+.btn.add-rdv-btn {
+  background: #007bff;
+  color: white;
+  padding: 0 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  height: 2.625rem;
+  min-width: 140px;
+  gap: 0.5rem;
+  box-shadow:0 2px 8px rgba(0, 123, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-weight: 500;
+  white-space: nowrap;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn.add-rdv-btn:hover {
+  background: #0069d9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.btn.add-rdv-btn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255,255,255,0.3) 0%,
+    rgba(255,255,255,0) 60%
+  );
+  transform: rotate(30deg);
+  transition: all 0.3s ease;
+}
+
+.btn.add-rdv-btn:hover::after {
+  left: 100%;
+}
+
+.btn-icon {
+  font-size: 0.875rem;
+}
+
+/* Table Styles */
+.rendezvous-table-container {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid #e0e0e0;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-height: 200px;
+}
+
+.rendezvous-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.rendezvous-table th {
+  background-color: #f8f9fa;
+  color: #2a3042;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  text-align: left;
+  padding: 0.9375rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.rendezvous-table td {
+  color: #4a4a4a;
+  padding: 0.9375rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Column width definitions */
+.rendezvous-table td:nth-child(1),
+.rendezvous-table th:nth-child(1) {
+  width: 120px;
+  min-width: 170px;
+  max-width: 220px;
+}
+
+.rendezvous-table td:nth-child(2),
+.rendezvous-table th:nth-child(2) {
+  width: 120px;
+  min-width: 120px;
+  max-width: 150px;
+  text-align: center;
+}
+
+.rendezvous-table td:nth-child(3),
+.rendezvous-table th:nth-child(3) {
+  width: 150px;
+  min-width: 150px;
+  text-align: center;
+}
+
+.rendezvous-table td:nth-child(4),
+.rendezvous-table th:nth-child(4) {
+  width: 180px;
+  min-width: 220px;
+  text-align: center;
+}
+
+.rendezvous-table td:nth-child(5),
+.rendezvous-table th:nth-child(5) {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+.rendezvous-table td:nth-child(6),
+.rendezvous-table th:nth-child(6) {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+.rendezvous-table tr:hover td {
+  background-color: #f8fafd;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.btn.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.action-icon {
+  font-size: 0.875rem;
+}
+
+.btn.action-button.view {
+  background-color: #38d16a;
+}
+
+.btn.action-button.view:hover {
+  background-color: #2fb85d;
+  transform: translateY(-1px);
+}
+
+.btn.action-button.edit {
+  background-color: #ffc107;
+}
+
+.btn.action-button.edit:hover {
+  background-color: #e6ac00;
+  transform: translateY(-1px);
+}
+
+.btn.action-button.delete {
+  background-color: #ff6b6b;
+}
+
+.btn.action-button.delete:hover {
+  background-color: #e65a5a;
+  transform: translateY(-1px);
+}
+
+/* Empty State */
+.no-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #9c9fa6;
+  font-size: 1rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.add-rdv-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 600px;
+  max-width: 90vw;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal-header {
+  padding-bottom: 1.5rem;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  color: #2a3042;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #9c9fa6;
+  transition: color 0.2s ease;
+  padding: 0.25rem;
+}
+
+.close-modal:hover {
+  color: #6c757d;
+}
+
+.modal-content {
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.form-fields {
+  padding: 0rem 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #4a4a4a;
+  font-size: 0.875rem;
+}
+.form-group input, .form-group select {
+  width: auto;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #4facfe;
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+  background-color: #fff;
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.modal-actions {
+  margin-right: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.modal-actions .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.modal-actions .cancel {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e0e0e0;
+}
+
+.modal-actions .cancel:hover {
+  background-color: #e9ecef;
+}
+
+.modal-actions .submit {
+  background: linear-gradient(to right, #007bff 0%, #339af0 100%); 
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.modal-actions .submit:hover {
+  background: linear-gradient(to right, #0069d9 0%, #2b8bd6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Delete Confirmation Modal */
+.delete-confirmation-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+  text-align: center;
+}
+
+.delete-confirmation-modal h3 {
+   color: #2a3042;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+
+.delete-confirmation-modal p {
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+
+/* View Rendez-vous Modal */
+.view-rdv-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90vw;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.view-rdv-modal .modal-header {
+  padding-bottom: 1.5rem;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.view-rdv-modal .modal-header h3 {
+  color: #2a3042;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.rdv-details {
+  margin: 1.5rem 0;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #6c757d;
+  width: 150px;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  flex: 1;
+  color: #2a3042;
+  font-size: 0.9375rem;
+  word-break: break-word;
+}
+
+.view-rdv-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: none; 
+}
+
+.view-rdv-modal .modal-actions .close {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: 120px;
+  background-color: #ff6b6b;
+  color: white;
+}
+
+.view-rdv-modal .modal-actions .close:hover {
+  background-color: #e65a5a;
+  transform: translateY(-1px);
+
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Scrollbar styling */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .rendezvous-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .rendezvous-controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .search-bar,
+  .filter-dropdown,
+  .btn.add-rdv-btn {
+    width: 100%;
+    height: 2.75rem;
+  }
+  
+  .rendezvous-table th,
+  .rendezvous-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .form-fields {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-group.full-width {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .rendezvous-section {
+    padding: 1rem;
+  }
+  
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .btn.action-button {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-content {
+    padding: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .detail-label {
+    width: 100%;
+  }
+  
+  .view-rdv-modal .modal-actions {
+    justify-content: center;
+  }
+  
+  .view-rdv-modal .modal-actions .btn {
+    width: 100%;
+  }
+  
+}

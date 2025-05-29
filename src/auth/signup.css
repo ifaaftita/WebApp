@@ -1,0 +1,200 @@
+/* Signup Form CSS */
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  padding: 20px;
+}
+
+.signup-form {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+}
+
+.signup-form h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2a7fba;
+  font-size: 28px;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.progress-step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ddd;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.progress-step.active {
+  background-color: #2a7fba;
+  color: white;
+}
+
+.progress-line {
+  height: 2px;
+  width: 50px;
+  background-color: #ddd;
+}
+
+.progress-line.active {
+  background-color: #2a7fba;
+}
+
+.form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #2a7fba;
+  outline: none;
+}
+
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 1em;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Form Actions - Updated */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+  gap: 15px;
+}
+
+.form-actions.double-buttons {
+  justify-content: space-between;
+}
+
+.prev-button,
+.next-button,
+.submit-button {
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.prev-button {
+  background-color: #f1f1f1;
+  color: #333;
+  border: none;
+}
+
+.prev-button:hover {
+  background-color: #ddd;
+}
+
+.next-button,
+.submit-button {
+  background-color: #2a7fba;
+  color: white;
+  border: none;
+}
+
+.next-button:hover,
+.submit-button:hover {
+  background-color: #1e6da1;
+}
+
+.image-previews {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.preview-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #555;
+}
+
+.login-link a {
+  color: #2a7fba;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .signup-form {
+    padding: 30px 20px;
+  }
+  
+  .form-actions,
+  .form-actions.double-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .prev-button,
+  .next-button,
+  .submit-button {
+    width: 100%;
+  }
+}
