@@ -197,6 +197,12 @@
   min-width: 120px;
   text-align: center;
 }
+.purchases-table td:nth-child(7),
+.purchases-table th:nth-child(7) {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
 
 .purchases-table tr:hover td {
   background-color: #f8fafd;

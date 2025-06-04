@@ -12,13 +12,10 @@ import {
   FaFileInvoice as InvoicesIcon,
   FaClipboardList as OrdersIcon,
   FaGlasses as ProductsIcon,
-  FaCashRegister as CashIcon,
-  FaWarehouse as StockIcon,
   FaTruck as DeliveryIcon,
   FaTag as BrandIcon,
   FaStore as ShopIcon,
   FaTruckLoading as SuppliersIcon,
-  FaMoneyBillWave as SecondaryCashIcon,
   FaUserCog as ProfileIcon
 } from 'react-icons/fa';
 
@@ -116,24 +113,6 @@ const Sidebar = () => {
             >
               <InvoicesIcon />
               <span>Factures</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/opticien/cashregistration"
-              className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
-            >
-              <CashIcon />
-              <span>Caisse</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/opticien/stock"
-              className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
-            >
-              <StockIcon />
-              <span>Stock</span>
             </NavLink>
           </li>
           <li>

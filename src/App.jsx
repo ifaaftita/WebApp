@@ -20,8 +20,6 @@ import Orders from './opticien/sections/orders';
 import Purchases from './opticien/sections/purchases';
 import Sales from './opticien/sections/sales';
 import Invoices from './opticien/sections/invoices';
-import Cashregistration from './opticien/sections/cashregistration';
-import Stock from './opticien/sections/stock';
 import Brand from './opticien/sections/brand';
 import Shop from './opticien/sections/shop';
 import Suppliers from './opticien/sections/suppliers';
@@ -79,8 +77,6 @@ const App = () => {
             <Route path="purchases" element={<Purchases />} />
             <Route path="sales" element={<Sales />} />
             <Route path="invoices" element={<Invoices />} />
-            <Route path="cashregistration" element={<Cashregistration />} />
-            <Route path="stock" element={<Stock />} />
             <Route path="brand" element={<Brand />} />
             <Route path="shop" element={<Shop />} />
             <Route path="suppliers" element={<Suppliers />} />
