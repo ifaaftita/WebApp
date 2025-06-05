@@ -94,7 +94,7 @@ const Sidebar = () => {
               className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
             >
               <PurchasesIcon />
-              <span>Achats</span>
+              <span>Stock</span>
             </NavLink>
           </li>
           <li>

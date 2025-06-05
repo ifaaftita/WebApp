@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './ClientsSection.css';
-
-import { getAllUsers, createUsers, deleteUsers } from '../../api/usersApi'
-import { createUserMappertoApi } from '../../helper/index'
-
 import { 
   FaSearch, 
   FaPlus, 
@@ -21,9 +17,8 @@ const ClientsSection = () => {
   const [clients, setClients] = useState([
     { 
       id: 1, 
-      name: 'AMIRA ZAARA', 
+      name: 'AMIRA MKADDEMI', 
       phone: '060000000', 
-      lastVisit: '2023-05-15',
       adresse: '123 Rue Principale, Tunis',
       email: 'amira@example.com',
       type: 'mobile'
@@ -32,7 +27,6 @@ const ClientsSection = () => {
       id: 2, 
       name: 'KENZA ROKH', 
       phone: '060000001', 
-      lastVisit: '2023-06-20',
       adresse: '456 Avenue Mohammed 5',
       email: 'kenza@example.com',
       type: 'store'
@@ -41,7 +35,6 @@ const ClientsSection = () => {
       id: 3, 
       name: 'AYTOUNI FATMA', 
       phone: '060000002', 
-      lastVisit: '2023-04-10',
       adresse: '789 Boulevard Barchalona , ',
       email: 'faytouni@example.com',
       type: 'mobile'
@@ -50,18 +43,11 @@ const ClientsSection = () => {
       id: 4, 
       name: 'AMINE TAKKALI', 
       phone: '060000003', 
-      lastVisit: '2023-07-05',
       adresse: '101 Boulevard 5, Ariena',
       email: 'amine@example.com',
       type: 'store'
     },
   ]);
-
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    getAllUsers().then(setUsers);
-  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -72,7 +58,6 @@ const ClientsSection = () => {
     firstName: '',
     lastName: '',
     phone: '',
-    lastVisit: '',
     adresse: '',
     email: '',
     type: ''
@@ -87,7 +72,7 @@ const ClientsSection = () => {
   const [viewingClient, setViewingClient] = useState(null);
 
   // Filter clients
-  const filteredClients = users.filter(client => {
+  const filteredClients = clients.filter(client => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = (
       client.name.toLowerCase().includes(searchLower) ||
@@ -122,7 +107,6 @@ const ClientsSection = () => {
       firstName: '',
       lastName: '',
       phone: '',
-      lastVisit: '',
       adresse: '',
       email: '',
       type: ''
@@ -167,17 +151,15 @@ const ClientsSection = () => {
     }
 
     const client = {
-      name: newClient.firstName,
-      lastName: newClient.lastName,
+      id: clients.length + 1,
+      name: `${newClient.lastName} ${newClient.firstName}`.toUpperCase(),
       phone: newClient.phone,
-      lastVisit: newClient.lastVisit || undefined,
       adresse: newClient.adresse || undefined,
       email: newClient.email || undefined,
       type: newClient.type
     };
-    const userData = createUserMappertoApi(client);
 
-    createUsers(userData)
+    setClients([...clients, client]);
     handleCloseModal();
   };
 
@@ -206,7 +188,6 @@ const ClientsSection = () => {
         firstName: firstName || '',
         lastName: lastName || '',
         phone: client.phone,
-        lastVisit: client.lastVisit || '',
         adresse: client.adresse || '',
         email: client.email || '',
         type: client.type
@@ -225,7 +206,7 @@ const ClientsSection = () => {
   };
 
   const confirmDelete = () => {
-    deleteUsers(clientToDelete)
+    setClients(clients.filter(client => client.id !== clientToDelete));
     setClientToDelete(null);
   };
 
@@ -255,7 +236,6 @@ const ClientsSection = () => {
         ...client,
         name: `${editingClient.lastName} ${editingClient.firstName}`.toUpperCase(),
         phone: editingClient.phone,
-        lastVisit: editingClient.lastVisit || undefined,
         adresse: editingClient.adresse || undefined,
         email: editingClient.email || undefined,
         type: editingClient.type
@@ -318,17 +298,6 @@ const ClientsSection = () => {
                       className={errors.phone ? 'error' : ''}
                     />
                     {errors.phone && <span className="error-message">Ce champ est obligatoire.</span>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="lastVisit">Dernière visite : (optionnel)</label>
-                    <input
-                      type="date"
-                      id="lastVisit"
-                      name="lastVisit"
-                      value={newClient.lastVisit || ''}
-                      onChange={handleInputChange}
-                    />
                   </div>
                   
                   <div className="form-group">
@@ -446,17 +415,6 @@ const ClientsSection = () => {
                     />
                     {errors.phone && <span className="error-message">Ce champ est obligatoire.</span>}
                   </div>
-
-                  <div className="form-group">
-                    <label htmlFor="edit-lastVisit">Dernière visite : (optionnel)</label>
-                    <input
-                      type="date"
-                      id="edit-lastVisit"
-                      name="lastVisit"
-                      value={editingClient.lastVisit || ''}
-                      onChange={(e) => setEditingClient({...editingClient, lastVisit: e.target.value})}
-                    />
-                  </div>
                   
                   <div className="form-group">
                     <label htmlFor="edit-adresse">Adresse : (optionnel)</label>
@@ -568,12 +526,6 @@ const ClientsSection = () => {
                 <span className="detail-value">{viewingClient.phone}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Dernière visite :</span>
-                <span className="detail-value">
-                  {viewingClient.lastVisit ? new Date(viewingClient.lastVisit).toLocaleDateString() : '-'}
-                </span>
-              </div>
-              <div className="detail-row">
                 <span className="detail-label">Adresse :</span>
                 <span className="detail-value">{viewingClient.adresse || '-'}</span>
               </div>
@@ -665,7 +617,6 @@ const ClientsSection = () => {
               <tr>
                 <th>Nom et Prénom</th>
                 <th>Téléphone</th>
-                <th>Dernière visite</th>
                 <th>Adresse</th>
                 <th>Email</th>
                 <th>Type</th>
@@ -677,7 +628,6 @@ const ClientsSection = () => {
                 <tr key={client.id}>
                   <td>{client.name}</td>
                   <td>{client.phone}</td>
-                  <td>{client.lastVisit ? new Date(client.lastVisit).toLocaleDateString() : '-'}</td>
                   <td>{client.adresse || '-'}</td>
                   <td>{client.email || '-'}</td>
                   <td>
