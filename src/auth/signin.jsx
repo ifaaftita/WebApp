@@ -71,7 +71,7 @@ const SignIn = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="exemple@gmail.com"
+              placeholder="Entrez votre adresse email"
               className={errors.email ? 'error-input' : ''}
             />
             {errors.email && <span className="error">{errors.email}</span>}

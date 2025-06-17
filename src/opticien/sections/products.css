@@ -45,7 +45,7 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 800px;
-  table-layout: fixed;
+
 }
 
 .products-table th {

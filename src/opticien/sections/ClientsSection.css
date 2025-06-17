@@ -967,3 +967,26 @@ html, body {
   overflow-x: hidden;
   width: 100%;
 }
+
+.confirmation-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-modal p {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.delete-confirm {
+  background-color: #ff4444;
+  color: white;
+}
+
+.delete-confirm:hover {
+  background-color: #cc0000;
+}

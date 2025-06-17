@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './ClientsSection.css';
 import { 
   FaSearch, 
@@ -11,44 +11,12 @@ import {
   FaStore,
   FaTimes
 } from 'react-icons/fa';
+import { getClientsByOptician, addClientToOptician,deleteClientFromOptician,updateClient } from '../../services/clientService';
+
 
 const ClientsSection = () => {
-  // Sample client data
-  const [clients, setClients] = useState([
-    { 
-      id: 1, 
-      name: 'AMIRA MKADDEMI', 
-      phone: '060000000', 
-      adresse: '123 Rue Principale, Tunis',
-      email: 'amira@example.com',
-      type: 'mobile'
-    },
-    { 
-      id: 2, 
-      name: 'KENZA ROKH', 
-      phone: '060000001', 
-      adresse: '456 Avenue Mohammed 5',
-      email: 'kenza@example.com',
-      type: 'store'
-    },
-    { 
-      id: 3, 
-      name: 'AYTOUNI FATMA', 
-      phone: '060000002', 
-      adresse: '789 Boulevard Barchalona , ',
-      email: 'faytouni@example.com',
-      type: 'mobile'
-    },
-    { 
-      id: 4, 
-      name: 'AMINE TAKKALI', 
-      phone: '060000003', 
-      adresse: '101 Boulevard 5, Ariena',
-      email: 'amine@example.com',
-      type: 'store'
-    },
-  ]);
-
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -60,7 +28,7 @@ const ClientsSection = () => {
     phone: '',
     adresse: '',
     email: '',
-    type: ''
+    type: 'mobile'
   });
   const [editingClient, setEditingClient] = useState(null);
   const [errors, setErrors] = useState({
@@ -70,16 +38,45 @@ const ClientsSection = () => {
   });
   const [clientToDelete, setClientToDelete] = useState(null);
   const [viewingClient, setViewingClient] = useState(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
-  // Filter clients
+  
+  const OPTICIAN_ID = '6734f979-bc42-4c75-f8aa-08dda6c401a1';
+  const fetchData = async () => {
+      try {
+        const { data } = await getClientsByOptician(OPTICIAN_ID);
+        const formatted = data.map((c) => ({
+          id: c.id,
+          name: c.firstName && c.lastName 
+            ? `${c.lastName} ${c.firstName}`.toUpperCase() 
+            : 'Nom non spécifié',
+          phone: c.phoneNumber || 'Non spécifié',
+          adresse: c.address || 'Non spécifié',
+          email: c.email || 'Non spécifié',
+          type: c.isMobileClient ? 'mobile' : 'store',
+          firstname: c.firstName || '',
+          lastname: c.lastName || ''
+        }));
+        setClients(formatted);
+      } catch (err) {
+        console.error('Error fetching clients', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  useEffect(() => {
+  
+    fetchData();
+  }, [OPTICIAN_ID]);
+
   const filteredClients = clients.filter(client => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = (
       client.name.toLowerCase().includes(searchLower) ||
-      client.phone.includes(searchTerm) ||
+      (client.phone && client.phone.includes(searchTerm)) ||
       (client.email && client.email.toLowerCase().includes(searchLower)) ||
-      (client.adresse && client.adresse.toLowerCase().includes(searchLower)))
-    
+      (client.adresse && client.adresse.toLowerCase().includes(searchLower))
+    );
     const matchesType = selectedFilter === 'all' || client.type === selectedFilter;
     
     return matchesSearch && matchesType;
@@ -91,7 +88,6 @@ const ClientsSection = () => {
     { value: 'store', label: 'Visiteurs Boutique', icon: <FaStore /> }
   ];
 
-  // Handle add new client modal
   const handleAddClient = () => {
     setShowAddClientModal(true);
     setErrors({
@@ -109,23 +105,17 @@ const ClientsSection = () => {
       phone: '',
       adresse: '',
       email: '',
-      type: ''
+      type: 'mobile'
     });
-  };
-
-  const handleCloseEditModal = () => {
-    setShowEditClientModal(false);
-    setEditingClient(null);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewClient(prev => ({
       ...prev,
-      [name]: value
+      [name]: value || ''
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -133,117 +123,167 @@ const ClientsSection = () => {
       }));
     }
   };
+const handleDeleteClick = (client) => {
+  setClientToDelete(client);
+  setShowDeleteConfirmation(true);
+};
 
-  const handleSubmitClient = (e) => {
-    e.preventDefault();
+const handleConfirmDelete = async () => {
+  try {
+    await deleteClientFromOptician(OPTICIAN_ID, clientToDelete.id);
     
-    // Vérification des champs obligatoires
-    const newErrors = {
-      firstName: !newClient.firstName,
-      lastName: !newClient.lastName,
-      phone: !newClient.phone
+    setClients(prevClients => 
+      prevClients.filter(client => client.id !== clientToDelete.id)
+    );
+    
+    setShowDeleteConfirmation(false);
+    setClientToDelete(null);
+   
+  } catch (error) {
+    console.error('Error deleting client:', error);
+    alert(`Erreur lors de la suppression: ${error.message}`);
+  }
+};
+
+const handleCancelDelete = () => {
+  setShowDeleteConfirmation(false);
+  setClientToDelete(null);
+};
+const handleSubmitClient = async (e) => {
+  e.preventDefault();
+  
+  // Validate required fields first
+  const validationErrors = {
+    firstName: !newClient.firstName?.trim(),
+    lastName: !newClient.lastName?.trim(),
+    phone: !newClient.phone?.trim()
+  };
+
+  setErrors(validationErrors);
+
+  // Check if there are any validation errors
+  if (Object.values(validationErrors).some(error => error)) {
+    alert("Veuillez remplir tous les champs obligatoires (Nom, Prénom et Téléphone)");
+    return;
+  }
+
+  try {
+    // Prepare the payload with proper fallbacks
+    const payload = {
+      firstName: newClient.firstName.trim(),
+      lastName: newClient.lastName.trim(),
+      phoneNumber: newClient.phone.trim(),
+      lastVisit: new Date().toISOString(),
+      address: newClient.adresse?.trim() || "Non spécifié",
+      email: newClient.email?.trim() || "Non spécifié",
+      isMobileClient: newClient.type === 'mobile',
+      isActive: true
     };
+
+    console.log("Submitting client data:", payload); // Debug log
+
+    const response = await addClientToOptician(OPTICIAN_ID, payload);
     
-    setErrors(newErrors);
-    
-    if (newErrors.firstName || newErrors.lastName || newErrors.phone) {
-      return;
+    if (!response?.data) {
+      throw new Error("La réponse du serveur est vide");
     }
 
-    const client = {
-      id: clients.length + 1,
-      name: `${newClient.lastName} ${newClient.firstName}`.toUpperCase(),
-      phone: newClient.phone,
-      adresse: newClient.adresse || undefined,
-      email: newClient.email || undefined,
-      type: newClient.type
-    };
+    const createdClient = response.data;
+    
+    // Update the clients list
+    setClients(prevClients => [
+      ...prevClients,
+      {
+        id: createdClient.id,
+        name: `${createdClient.lastName} ${createdClient.firstName}`.toUpperCase(),
+        phone: createdClient.phoneNumber,
+        adresse: createdClient.address,
+        email: createdClient.email,
+        type: createdClient.isMobileClient ? 'mobile' : 'store',
+        isActive: createdClient.isActive
+      }
+    ]);
 
-    setClients([...clients, client]);
+    // Close modal and reset form
     handleCloseModal();
-  };
+    fetchData();
+    alert('Client ajouté avec succès!');
 
-  // Action handlers
-  const handleView = (clientId) => {
-    const client = clients.find(c => c.id === clientId);
-    setViewingClient(client);
-  };
+  } catch (error) {
+    console.error("Erreur détaillée:", {
+      error: error,
+      response: error.response,
+      message: error.message
+    });
 
-  const handleCloseView = () => {
-    setViewingClient(null);
-  };
-
-  const handleEdit = (clientId) => {
-    const client = clients.find(c => c.id === clientId);
-    if (client) {
-      // Split the name into last name and first name
-      const [lastName, firstName] = client.name.split(' ').reduce((acc, part, index) => {
-        if (index === 0) acc[0] = part;
-        else acc[1] = (acc[1] || '') + (index > 1 ? ' ' : '') + part;
-        return acc;
-      }, ['', '']);
-      
-      setEditingClient({
-        id: client.id,
-        firstName: firstName || '',
-        lastName: lastName || '',
-        phone: client.phone,
-        adresse: client.adresse || '',
-        email: client.email || '',
-        type: client.type
-      });
-      setShowEditClientModal(true);
-      setErrors({
-        firstName: false,
-        lastName: false,
-        phone: false
-      });
-    }
-  };
-
-  const handleDelete = (clientId) => {
-    setClientToDelete(clientId);
-  };
-
-  const confirmDelete = () => {
-    setClients(clients.filter(client => client.id !== clientToDelete));
-    setClientToDelete(null);
-  };
-
-  const cancelDelete = () => {
-    setClientToDelete(null);
-  };
-
-  const handleUpdateClient = (e) => {
-    e.preventDefault();
+    let errorMessage = "Une erreur est survenue lors de l'ajout du client";
     
-    // Validation
-    const newErrors = {
-      firstName: !editingClient.firstName,
-      lastName: !editingClient.lastName,
-      phone: !editingClient.phone
-    };
-    
-    setErrors(newErrors);
-    
-    if (newErrors.firstName || newErrors.lastName || newErrors.phone) {
-      return;
+    if (error.response) {
+      // Handle HTTP errors
+      if (error.response.status === 400) {
+        errorMessage = "Données invalides: " + 
+          (error.response.data?.message || JSON.stringify(error.response.data));
+      } else if (error.response.status === 500) {
+        errorMessage = "Erreur serveur. Veuillez réessayer plus tard.";
+      }
+    } else if (error.message) {
+      // Handle other errors
+      errorMessage = error.message;
     }
 
-    // Update the client
+    alert(errorMessage);
+  }
+};
+
+const handleEditClient = (client) => {
+  setEditingClient({
+    id: client.id,
+    firstName: client.firstname || '',
+    lastName: client.lastname || '',
+    phone: client.phone || '',
+    adresse: client.adresse || '',
+    email: client.email || '',
+    type: client.type || 'mobile'
+  });
+  setShowEditClientModal(true);
+};
+
+const handleUpdateClient = async (e) => {
+  e.preventDefault();
+  
+  // Validate required fields
+  if (!editingClient.firstName || !editingClient.lastName || !editingClient.phone) {
+    alert("Veuillez remplir tous les champs obligatoires");
+    return;
+  }
+
+  try {
+    const opticianId = "6734f979-bc42-4c75-f8aa-08dda6c401a1";
+    const response = await updateClient(opticianId, editingClient.id, editingClient);
+    
+    // Update the client in the local state
     setClients(clients.map(client => 
-      client.id === editingClient.id ? {
-        ...client,
-        name: `${editingClient.lastName} ${editingClient.firstName}`.toUpperCase(),
-        phone: editingClient.phone,
-        adresse: editingClient.adresse || undefined,
-        email: editingClient.email || undefined,
-        type: editingClient.type
-      } : client
+      client.id === editingClient.id 
+        ? { 
+            ...client, 
+            name: `${editingClient.lastName} ${editingClient.firstName}`.toUpperCase(),
+            phone: editingClient.phone,
+            adresse: editingClient.adresse,
+            email: editingClient.email,
+            type: editingClient.type
+          } 
+        : client
     ));
-    
-    handleCloseEditModal();
-  };
+
+    setShowEditClientModal(false);
+    alert('Client mis à jour avec succès!');
+  } catch (err) {
+    console.error('Error updating client:', err);
+    alert(`Erreur lors de la mise à jour du client: ${err.response?.data?.message || err.message}`);
+  }
+};
+
+
 
   return (
     <div className="clients-section">
@@ -252,7 +292,7 @@ const ClientsSection = () => {
         <div className="modal-overlay">
           <div className="add-client-modal">
             <div className="modal-header">
-              <h3>Ajouter un nouveau client :</h3>
+              <h3>Ajouter un nouveau client</h3>
               <button className="close-modal" onClick={handleCloseModal}>
                 <FaTimes />
               </button>
@@ -262,49 +302,45 @@ const ClientsSection = () => {
               <form onSubmit={handleSubmitClient}>
                 <div className="form-fields">
                   <div className="form-group">
-                    <label htmlFor="lastName">Nom :</label>
+                    <label>Nom :</label>
                     <input
                       type="text"
-                      id="lastName"
                       name="lastName"
                       value={newClient.lastName}
                       onChange={handleInputChange}
                       className={errors.lastName ? 'error' : ''}
                     />
-                    {errors.lastName && <span className="error-message">Ce champ est obligatoire.</span>}
+                    {errors.lastName && <span className="error-message">Ce champ est obligatoire</span>}
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="firstName">Prénom :</label>
+                    <label>Prénom :</label>
                     <input
                       type="text"
-                      id="firstName"
                       name="firstName"
                       value={newClient.firstName}
                       onChange={handleInputChange}
                       className={errors.firstName ? 'error' : ''}
                     />
-                    {errors.firstName && <span className="error-message">Ce champ est obligatoire.</span>}
+                    {errors.firstName && <span className="error-message">Ce champ est obligatoire</span>}
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="phone">Téléphone :</label>
+                    <label>Téléphone :</label>
                     <input
                       type="tel"
-                      id="phone"
                       name="phone"
                       value={newClient.phone}
                       onChange={handleInputChange}
                       className={errors.phone ? 'error' : ''}
                     />
-                    {errors.phone && <span className="error-message">Ce champ est obligatoire.</span>}
+                    {errors.phone && <span className="error-message">Ce champ est obligatoire</span>}
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="adresse">Adresse : (optionnel)</label>
+                    <label>Adresse : (optionnel)</label>
                     <input
                       type="text"
-                      id="adresse"
                       name="adresse"
                       value={newClient.adresse}
                       onChange={handleInputChange}
@@ -312,18 +348,17 @@ const ClientsSection = () => {
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="email">Email : (optionnel)</label>
+                    <label>Email : (optionnel)</label>
                     <input
                       type="email"
-                      id="email"
                       name="email"
                       value={newClient.email}
                       onChange={handleInputChange}
                     />
                   </div>
                   
-                  <div className="form-group full-width">
-                    <label>Type du client :</label>
+                  <div className="form-group">
+                    <label>Type :</label>
                     <div className="type-options">
                       <label className={newClient.type === 'mobile' ? 'selected' : ''}>
                         <input
@@ -331,9 +366,9 @@ const ClientsSection = () => {
                           name="type"
                           value="mobile"
                           checked={newClient.type === 'mobile'}
-                          onChange={handleInputChange}
+                          onChange={() => setNewClient({...newClient, type: 'mobile'})}
                         />
-                        <FaMobileAlt /> Utilisateur Mobile
+                        <FaMobileAlt /> Mobile
                       </label>
                       <label className={newClient.type === 'store' ? 'selected' : ''}>
                         <input
@@ -341,9 +376,9 @@ const ClientsSection = () => {
                           name="type"
                           value="store"
                           checked={newClient.type === 'store'}
-                          onChange={handleInputChange}
+                          onChange={() => setNewClient({...newClient, type: 'store'})}
                         />
-                        <FaStore /> Visiteur Boutique
+                        <FaStore /> Boutique
                       </label>
                     </div>
                   </div>
@@ -354,7 +389,7 @@ const ClientsSection = () => {
                     Annuler
                   </button>
                   <button type="submit" className="btn submit">
-                    Terminé
+                    Ajouter
                   </button>
                 </div>
               </form>
@@ -362,200 +397,139 @@ const ClientsSection = () => {
           </div>
         </div>
       )}
+      {showEditClientModal && (
+  <div className="modal-overlay">
+    <div className="add-client-modal">
+      <div className="modal-header">
+        <h3>Modifier le client</h3>
+        <button className="close-modal" onClick={() => setShowEditClientModal(false)}>
+          <FaTimes />
+        </button>
+      </div>
+      
+      <div className="modal-content">
+        <form onSubmit={handleUpdateClient}>
+          <div className="form-fields">
+            <div className="form-group">
+              <label>Nom :</label>
+              <input
+                type="text"
+                name="lastName"
+                value={editingClient?.lastName || ''}
+                onChange={(e) => setEditingClient({...editingClient, lastName: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Prénom :</label>
+              <input
+                type="text"
+                name="firstName"
+                value={editingClient?.firstName || ''}
+                onChange={(e) => setEditingClient({...editingClient, firstName: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Téléphone :</label>
+              <input
+                type="tel"
+                name="phone"
+                value={editingClient?.phone || ''}
+                onChange={(e) => setEditingClient({...editingClient, phone: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Adresse : (optionnel)</label>
+              <input
+                type="text"
+                name="adresse"
+                value={editingClient?.adresse || ''}
+                onChange={(e) => setEditingClient({...editingClient, adresse: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Email : (optionnel)</label>
+              <input
+                type="email"
+                name="email"
+                value={editingClient?.email || ''}
+                onChange={(e) => setEditingClient({...editingClient, email: e.target.value})}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Type :</label>
+              <div className="type-options">
+                <label className={editingClient?.type === 'mobile' ? 'selected' : ''}>
+                  <input
+                    type="radio"
+                    name="type"
+                    value="mobile"
+                    checked={editingClient?.type === 'mobile'}
+                    onChange={() => setEditingClient({...editingClient, type: 'mobile'})}
+                  />
+                  <FaMobileAlt /> Mobile
+                </label>
+                <label className={editingClient?.type === 'store' ? 'selected' : ''}>
+                  <input
+                    type="radio"
+                    name="type"
+                    value="store"
+                    checked={editingClient?.type === 'store'}
+                    onChange={() => setEditingClient({...editingClient, type: 'store'})}
+                  />
+                  <FaStore /> Boutique
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div className="modal-actions">
+            <button type="button" className="btn cancel" onClick={() => setShowEditClientModal(false)}>
+              Annuler
+            </button>
+            <button type="submit" className="btn submit">
+              Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
 
-      {/* Edit Client Modal */}
-      {showEditClientModal && editingClient && (
+ {showDeleteConfirmation && (
         <div className="modal-overlay">
-          <div className="add-client-modal">
+          <div className="confirmation-modal">
             <div className="modal-header">
-              <h3>Modifier le client :</h3>
-              <button className="close-modal" onClick={handleCloseEditModal}>
+              <h3>Confirmer la suppression</h3>
+              <button className="close-modal" onClick={handleCancelDelete}>
                 <FaTimes />
               </button>
             </div>
-            
             <div className="modal-content">
-              <form onSubmit={handleUpdateClient}>
-                <div className="form-fields">
-                  <div className="form-group">
-                    <label htmlFor="edit-lastName">Nom :</label>
-                    <input
-                      type="text"
-                      id="edit-lastName"
-                      name="lastName"
-                      value={editingClient.lastName}
-                      onChange={(e) => setEditingClient({...editingClient, lastName: e.target.value})}
-                      className={errors.lastName ? 'error' : ''}
-                    />
-                    {errors.lastName && <span className="error-message">Ce champ est obligatoire.</span>}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="edit-firstName">Prénom :</label>
-                    <input
-                      type="text"
-                      id="edit-firstName"
-                      name="firstName"
-                      value={editingClient.firstName}
-                      onChange={(e) => setEditingClient({...editingClient, firstName: e.target.value})}
-                      className={errors.firstName ? 'error' : ''}
-                    />
-                    {errors.firstName && <span className="error-message">Ce champ est obligatoire.</span>}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="edit-phone">Téléphone :</label>
-                    <input
-                      type="tel"
-                      id="edit-phone"
-                      name="phone"
-                      value={editingClient.phone}
-                      onChange={(e) => setEditingClient({...editingClient, phone: e.target.value})}
-                      className={errors.phone ? 'error' : ''}
-                    />
-                    {errors.phone && <span className="error-message">Ce champ est obligatoire.</span>}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="edit-adresse">Adresse : (optionnel)</label>
-                    <input
-                      type="text"
-                      id="edit-adresse"
-                      name="adresse"
-                      value={editingClient.adresse}
-                      onChange={(e) => setEditingClient({...editingClient, adresse: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="edit-email">Email : (optionnel)</label>
-                    <input
-                      type="email"
-                      id="edit-email"
-                      name="email"
-                      value={editingClient.email}
-                      onChange={(e) => setEditingClient({...editingClient, email: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="form-group full-width">
-                    <label>Type du client :</label>
-                    <div className="type-options">
-                      <label className={editingClient.type === 'mobile' ? 'selected' : ''}>
-                        <input
-                          type="radio"
-                          name="type"
-                          value="mobile"
-                          checked={editingClient.type === 'mobile'}
-                          onChange={() => setEditingClient({...editingClient, type: 'mobile'})}
-                        />
-                        <FaMobileAlt /> Utilisateur Mobile
-                      </label>
-                      <label className={editingClient.type === 'store' ? 'selected' : ''}>
-                        <input
-                          type="radio"
-                          name="type"
-                          value="store"
-                          checked={editingClient.type === 'store'}
-                          onChange={() => setEditingClient({...editingClient, type: 'store'})}
-                        />
-                        <FaStore /> Visiteur Boutique
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="modal-actions">
-                  <button type="button" className="btn cancel" onClick={handleCloseEditModal}>
-                    Annuler
-                  </button>
-                  <button type="submit" className="btn submit">
-                    Enregistrer
-                  </button>
-                </div>
-              </form>
+              <p>Êtes-vous sûr de vouloir supprimer le client {clientToDelete?.name} ?</p>
+              <div className="modal-actions">
+                <button 
+                  className="btn cancel" 
+                  onClick={handleCancelDelete}
+                >
+                  Annuler
+                </button>
+                <button 
+                  className="btn delete-confirm" 
+                  onClick={handleConfirmDelete}
+                >
+                  Supprimer
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* Delete Confirmation Modal */}
-      {clientToDelete && (
-        <div className="modal-overlay">
-          <div className="delete-confirmation-modal">
-            <h3>Supprimer?</h3>
-            <p>Êtes-vous sûr de vouloir supprimer ce client?</p>
-            <div className="modal-actions">
-              <button 
-                type="button" 
-                className="btn cancel" 
-                onClick={cancelDelete}
-              >
-                Annuler
-              </button>
-              <button 
-                type="button" 
-                className="btn delete" 
-                onClick={confirmDelete}
-              >
-                Supprimer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* View Client Modal */}
-      {viewingClient && (
-        <div className="modal-overlay">
-          <div className="view-client-modal">
-            <div className="modal-header">
-              <h3>Détails du Client :</h3>
-              <button className="close-modal" onClick={handleCloseView}>
-                <FaTimes />
-              </button>
-            </div>
-            
-            <div className="client-details">
-              <div className="detail-row">
-                <span className="detail-label">Nom et Prénom :</span>
-                <span className="detail-value">{viewingClient.name}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Téléphone :</span>
-                <span className="detail-value">{viewingClient.phone}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Adresse :</span>
-                <span className="detail-value">{viewingClient.adresse || '-'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Email :</span>
-                <span className="detail-value">{viewingClient.email || '-'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Type :</span>
-                <span className="detail-value">
-                  <span className={`type-text ${viewingClient.type}`}>
-                    {viewingClient.type === 'mobile' ? 'Mobile' : 'Boutique'}
-                  </span>
-                </span>
-              </div>
-            </div>
-            
-            <div className="modal-actions">
-              <button 
-                type="button" 
-                className="btn close" 
-                onClick={handleCloseView}
-              >
-                Fermer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main Clients Section */}
       <div className="clients-header">
         <h2>Clients</h2>
@@ -611,7 +585,11 @@ const ClientsSection = () => {
       </div>
 
       <div className="clients-table-container">
-        {filteredClients.length > 0 ? (
+        {loading ? (
+          <div className="loading">
+            <p>Chargement des clients...</p>
+          </div>
+        ) : filteredClients.length > 0 ? (
           <table className="clients-table">
             <thead>
               <tr>
@@ -628,8 +606,8 @@ const ClientsSection = () => {
                 <tr key={client.id}>
                   <td>{client.name}</td>
                   <td>{client.phone}</td>
-                  <td>{client.adresse || '-'}</td>
-                  <td>{client.email || '-'}</td>
+                  <td>{client.adresse}</td>
+                  <td>{client.email}</td>
                   <td>
                     <span className={`type-badge ${client.type}`}>
                       {client.type === 'mobile' ? (
@@ -647,19 +625,19 @@ const ClientsSection = () => {
                     <div className="action-buttons">
                       <button 
                         className="btn action-button view"
-                        onClick={() => handleView(client.id)}
                       >
                         <FaEye className="action-icon" />
                       </button>
                       <button 
                         className="btn action-button edit"
-                        onClick={() => handleEdit(client.id)}
+                        onClick={() => handleEditClient(client)}
                       >
-                        <FaEdit className="action-icon" />
+                        <FaEdit className="action-icon"  />
+
                       </button>
                       <button 
                         className="btn action-button delete"
-                        onClick={() => handleDelete(client.id)}
+                        onClick={() => handleDeleteClick(client)}
                       >
                         <FaTrash className="action-icon" />
                       </button>
@@ -678,5 +656,6 @@ const ClientsSection = () => {
     </div>
   );
 };
+
 
 export default ClientsSection;
