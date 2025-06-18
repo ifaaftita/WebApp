@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import './signin.css';
+import { getAuthOptician } from '../services/authService';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -40,7 +41,8 @@ const SignIn = () => {
     
     if (validateForm()) {
       try {
-        const user = login(email, password);
+        const response = await getAuthOptician({ email: email, password: password });
+        const user = login(response.email, response.password, response.id, response.role);
         
         if (rememberMe) {
           localStorage.setItem('rememberMe', 'true');
