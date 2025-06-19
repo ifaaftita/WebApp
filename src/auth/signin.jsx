@@ -41,7 +41,7 @@ const SignIn = () => {
     
     if (validateForm()) {
       try {
-        const response = await getAuthOptician({ email: email, password: password });
+        const response = await getAuthOptician(email);
         const user = login(response.email, response.password, response.id, response.role);
         
         if (rememberMe) {

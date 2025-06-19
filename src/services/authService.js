@@ -5,28 +5,23 @@ const API_BASE_URL = 'http://localhost:5011/api';
 // export const getAuthOptician = (opticianEmail) =>
 //   axios.get(`${API_BASE_URL}/Opticiens/${opticianEmail}/Get`);
 
-export const getAuthOptician = async (clientData) => {
+export const getAuthOptician = async (email) => {
+  console.log('*************email: ', email)
   try {
-    const payload = {
-      email: clientData.email?.trim(),
-      password: clientData.password,
-    };
-
     const response = await axios.post(
-      `${API_BASE_URL}/Opticiens/getAuthClient`,
-      payload,
+      '/api/Opticiens/getByEmail',
+      { email },
       {
         headers: {
           'Content-Type': 'application/json'
         }
       }
     );
-
-    return response;
+    console.log('*************response.data: ', response.data)
+    return response.data;
   } catch (error) {
-    console.error('Error in addClientToOptician:', error);
+    console.error('Error fetching opticien by email:', error);
     throw error;
   }
-  
 };
  
